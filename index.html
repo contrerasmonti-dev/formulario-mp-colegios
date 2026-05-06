@@ -290,6 +290,20 @@
             font-size: 0.7rem;
             margin-left: 4px;
         }
+        /* Estilos para contador de caracteres */
+        .char-counter {
+            font-size: 0.7rem;
+            text-align: right;
+            margin-top: 4px;
+            color: #6c757d;
+        }
+        .char-counter.warning {
+            color: #d9534f;
+            font-weight: bold;
+        }
+        .textarea-container {
+            position: relative;
+        }
         @media (max-width: 768px) {
             form { padding: 1rem; }
             .section { padding-left: 0.8rem; }
@@ -446,22 +460,38 @@
             <div id="agresorLimiteMsg" class="advertencia-limite"></div>
         </div>
 
-        <!-- II-V Secciones narrativas -->
-        <div class="section"><div class="section-title">II. Antecedentes Escolares</div>
+        <!-- II-V Secciones narrativas con contador de caracteres -->
+        <div class="section">
+            <div class="section-title">II. Antecedentes Escolares</div>
             <div class="descripcion-texto"><strong>Descripción:</strong> Antecedentes conductuales o de socialización del NNA con grupo de pares o docentes, necesidades especiales, rol del apoderado.</div>
-            <textarea name="antecedentes_escolares" id="antecedentes_escolares" rows="5" placeholder="Escriba aquí los antecedentes escolares..."></textarea>
+            <div class="textarea-container">
+                <textarea name="antecedentes_escolares" id="antecedentes_escolares" rows="5" maxlength="2000" placeholder="Escriba aquí los antecedentes escolares..."></textarea>
+                <div id="contadorEscolares" class="char-counter">0 / 2000 caracteres</div>
+            </div>
         </div>
-        <div class="section"><div class="section-title">III. Antecedentes Familiares</div>
+        <div class="section">
+            <div class="section-title">III. Antecedentes Familiares</div>
             <div class="descripcion-texto"><strong>Descripción:</strong> Composición del grupo familiar, cuidado del NNA, rol del apoderado, respuesta del adulto frente a acciones del establecimiento.</div>
-            <textarea name="antecedentes_familiares" id="antecedentes_familiares" rows="6" placeholder="Escriba aquí los antecedentes familiares..."></textarea>
+            <div class="textarea-container">
+                <textarea name="antecedentes_familiares" id="antecedentes_familiares" rows="6" maxlength="2000" placeholder="Escriba aquí los antecedentes familiares..."></textarea>
+                <div id="contadorFamiliares" class="char-counter">0 / 2000 caracteres</div>
+            </div>
         </div>
-        <div class="section"><div class="section-title">IV. Requerimiento de Medida de Protección</div>
+        <div class="section">
+            <div class="section-title">IV. Requerimiento de Medida de Protección</div>
             <div class="descripcion-texto"><strong>Descripción:</strong> Vulneraciones de derecho detectadas y medidas de protección solicitadas.</div>
-            <textarea name="vulneraciones" id="vulneraciones" rows="6" placeholder="Señale vulneraciones y requerimiento concreto..."></textarea>
+            <div class="textarea-container">
+                <textarea name="vulneraciones" id="vulneraciones" rows="6" maxlength="2000" placeholder="Señale vulneraciones y requerimiento concreto..."></textarea>
+                <div id="contadorVulneraciones" class="char-counter">0 / 2000 caracteres</div>
+            </div>
         </div>
-        <div class="section"><div class="section-title">V. Acciones del Establecimiento Educacional</div>
+        <div class="section">
+            <div class="section-title">V. Acciones del Establecimiento Educacional</div>
             <div class="descripcion-texto"><strong>Descripción:</strong> Gestiones, derivaciones, entrevistas, profesionales involucrados.</div>
-            <textarea name="acciones_establecimiento" id="acciones_establecimiento" rows="6" placeholder="Detalle las acciones realizadas..."></textarea>
+            <div class="textarea-container">
+                <textarea name="acciones_establecimiento" id="acciones_establecimiento" rows="6" maxlength="2000" placeholder="Detalle las acciones realizadas..."></textarea>
+                <div id="contadorAcciones" class="char-counter">0 / 2000 caracteres</div>
+            </div>
         </div>
 
         <div class="button-group">
@@ -469,12 +499,40 @@
             <button type="button" id="generarPdfProfesional" class="pdf-profesional">Generar / Imprimir PDF</button>
             <button type="button" id="resetFormBtn" class="reset-btn">Limpiar formulario</button>
         </div>
-        <div class="footer-note">* RUT Chileno obligatorio para NNA y Adultos Responsables. Pasaporte no obligatorio. Correo electrónico validado solo en adultos responsables.</div>
+        <div class="footer-note">* RUT Chileno obligatorio para NNA y Adultos Responsables. Pasaporte no obligatorio. Correo electrónico validado solo en adultos responsables. Límite de 2000 caracteres por campo de texto.</div>
     </form>
 </div>
 
 <script>
-    // Funciones auxiliares
+    // ==================== CONTADOR DE CARACTERES ====================
+    const MAX_CARACTERES = 2000;
+    
+    function inicializarContador(textareaId, contadorId) {
+        const textarea = document.getElementById(textareaId);
+        const contador = document.getElementById(contadorId);
+        
+        if (textarea && contador) {
+            function actualizarContador() {
+                const longitud = textarea.value.length;
+                contador.textContent = `${longitud} / ${MAX_CARACTERES} caracteres`;
+                if (longitud >= MAX_CARACTERES) {
+                    contador.classList.add('warning');
+                } else {
+                    contador.classList.remove('warning');
+                }
+            }
+            textarea.addEventListener('input', actualizarContador);
+            actualizarContador();
+        }
+    }
+    
+    // Inicializar contadores para los 4 textarea
+    inicializarContador('antecedentes_escolares', 'contadorEscolares');
+    inicializarContador('antecedentes_familiares', 'contadorFamiliares');
+    inicializarContador('vulneraciones', 'contadorVulneraciones');
+    inicializarContador('acciones_establecimiento', 'contadorAcciones');
+    
+    // ==================== FUNCIONES AUXILIARES ====================
     function calcularEdad(fechaNacimiento) {
         if (!fechaNacimiento) return '';
         const hoy = new Date();
@@ -505,7 +563,6 @@
         return dvCaracter === dvIngresado;
     }
 
-    // Función SIMPLIFICADA: solo formato con guión (sin puntos)
     function formatearRutParaPdf(rut) {
         if (!rut) return '';
         let cleaned = rut.trim().replace(/\./g, '').replace(/\-/g, '').toUpperCase();
@@ -819,11 +876,29 @@
         else alert("Todos los campos obligatorios están correctos.");
     });
 
-    // Generación PDF con márgenes reducidos
-    function generarInformeProfesional() {
-        const errores = validarTodoAntesDePDF();
-        if (errores.length) { alert("No se puede generar el informe:\n- " + errores.join("\n- ")); return; }
+    // Función para mostrar mensaje recordatorio de la Oficina Judicial Virtual
+    function mostrarMensajeOficinaVirtual() {
+        return confirm(
+            "No olvide que este documento debe ser subido a la Oficina Judicial Virtual\n\n" +
+            "https://oficinajudicialvirtual.pjud.cl/\n\n" +
+            "¿Desea continuar para generar el PDF?"
+        );
+    }
 
+    // Generación PDF con márgenes reducidos y mensaje recordatorio
+    function generarInformeProfesional() {
+        // PRIMERO: Validar campos obligatorios
+        const errores = validarTodoAntesDePDF();
+        if (errores.length) { 
+            alert("No se puede generar el informe:\n- " + errores.join("\n- ")); 
+            return; 
+        }
+        
+        // SEGUNDO: Mostrar mensaje recordatorio de la Oficina Judicial Virtual
+        const continuar = mostrarMensajeOficinaVirtual();
+        if (!continuar) return; // Si el usuario cancela, no genera el PDF
+        
+        // TERCERO: Generar el PDF
         const establecimiento = { nombre: document.getElementById('est_nombre').value.trim() || "Sin especificar", direccion: document.getElementById('est_direccion').value.trim() || "Sin dirección", comuna: document.getElementById('est_comuna').value, telefono: document.getElementById('est_telefono').value.trim() || "Sin teléfono", email: document.getElementById('est_email').value.trim() || "Sin correo" };
         const nna = { nombre: document.getElementById('nombre_nna').value || "___________________", fechaNac: document.getElementById('fecha_nac_nna').value ? document.getElementById('fecha_nac_nna').value.split('-').reverse().join('/') : "________", edad: document.getElementById('edad_nna').value || "___", nacionalidad: document.getElementById('nacionalidad_nna').value || "No especificada", identificacion: (rutNnaTipo.value === 'rut' ? formatearRutParaPdf(rutNnaInput.value) : rutNnaInput.value) || "________", domicilio: document.getElementById('domicilio_nna').value || "___________________", curso: document.getElementById('curso_nna').value || "________", establecimientoEduc: document.getElementById('est_educ_nna').value || "________" };
         
@@ -861,14 +936,13 @@
         function escapeHtml(s) { if (!s) return ''; return s.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
         
         let tablaAdultos = '<table border="1"><thead><tr><th>Nombre</th><th>Nacionalidad</th><th>Identificación</th><th>Domicilio</th><th>Teléfono</th><th>Email</th><th>Actividad</th></tr></thead><tbody>';
-        adultos.forEach(a => tablaAdultos += `<tr><td>${escapeHtml(a.nombre)}</td><td>${escapeHtml(a.nacionalidad)}</td><td>${escapeHtml(a.identificacion)}</td><td>${escapeHtml(a.domicilio)}</td><td>${escapeHtml(a.fono)}</td><td>${escapeHtml(a.email)}</td><td>${escapeHtml(a.actividad)}</td></tr>`);
+        adultos.forEach(a => tablaAdultos += `<tr><td>${escapeHtml(a.nombre)}</td><td>${escapeHtml(a.nacionalidad)}</td><td>${escapeHtml(a.identificacion)}</td><td>${escapeHtml(a.domicilio)}</td><td>${escapeHtml(a.fono)}</td><td>${escapeHtml(a.email)}</td><td>${escapeHtml(a.actividad)}</td>`);
         tablaAdultos += '</tbody></table>';
         
         let tablaAgresores = '<table border="1"><thead><tr><th>Nombre</th><th>Nacionalidad</th><th>F.Nac.</th><th>Edad</th><th>Identificación</th><th>Domicilio</th><th>Curso</th><th>Est. Educ.</th></tr></thead><tbody>';
-        agresores.forEach(a => tablaAgresores += `<tr><td>${escapeHtml(a.nombre)}</td><td>${escapeHtml(a.nacionalidad)}</td><td>${escapeHtml(a.fechaNac)}</td><td>${escapeHtml(a.edad)}</td><td>${escapeHtml(a.identificacion)}</td><td>${escapeHtml(a.domicilio)}</td><td>${escapeHtml(a.curso)}</td><td>${escapeHtml(a.estEduc)}</td></tr>`);
+        agresores.forEach(a => tablaAgresores += `<tr><td>${escapeHtml(a.nombre)}</td><td>${escapeHtml(a.nacionalidad)}</td><td>${escapeHtml(a.fechaNac)}</td><td>${escapeHtml(a.edad)}</td><td>${escapeHtml(a.identificacion)}</td><td>${escapeHtml(a.domicilio)}</td><td>${escapeHtml(a.curso)}</td><td>${escapeHtml(a.estEduc)}</td>`);
         tablaAgresores += '</tbody></table>';
 
-        // Márgenes reducidos: superior 1cm, inferior 1cm, izquierdo 1.2cm, derecho 1.2cm
         const contenido = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Informe_Medida_Proteccion</title><style>
             body{font-family:"Times New Roman",serif;padding:1cm 1.2cm;font-size:12pt;margin:0;} 
             .membrete{text-align:right;border-bottom:1px solid #aaa;padding-bottom:0.5rem;margin-bottom:1rem;} 
