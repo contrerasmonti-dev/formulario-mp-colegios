@@ -290,7 +290,6 @@
             font-size: 0.7rem;
             margin-left: 4px;
         }
-        /* Estilos para contador de caracteres */
         .char-counter {
             font-size: 0.7rem;
             text-align: right;
@@ -303,6 +302,14 @@
         }
         .textarea-container {
             position: relative;
+        }
+        /* iframe oculto para impresión */
+        #printFrame {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border: 0;
+            visibility: hidden;
         }
         @media (max-width: 768px) {
             form { padding: 1rem; }
@@ -318,6 +325,10 @@
         <h1>Formulario MP - Solicitud de Medida de Protección</h1>
         <p>Formulario dinámico | Hasta 3 adultos responsables y 5 presuntos agresores | Validación RUT/Pasaporte | Correo electrónico (solo adultos)</p>
     </div>
+    
+    <!-- IFRAME OCULTO PARA IMPRESIÓN (NO ES BLOQUEADO POR EL NAVEGADOR) -->
+    <iframe id="printFrame" title="Impresión de documento"></iframe>
+    
     <form id="proteccionForm">
         <!-- DATOS DEL ESTABLECIMIENTO -->
         <div class="section">
@@ -526,7 +537,6 @@
         }
     }
     
-    // Inicializar contadores para los 4 textarea
     inicializarContador('antecedentes_escolares', 'contadorEscolares');
     inicializarContador('antecedentes_familiares', 'contadorFamiliares');
     inicializarContador('vulneraciones', 'contadorVulneraciones');
@@ -851,7 +861,7 @@
     actualizarBotonesAdultos();
     actualizarBotonesAgresores();
 
-    // Validación global
+    // Validación global antes de generar PDF
     function validarTodoAntesDePDF() {
         let errores = [];
         if (rutNnaTipo.value === 'rut' && !rutNnaInput.value.trim()) errores.push("RUT del NNA es obligatorio");
@@ -876,31 +886,45 @@
         else alert("Todos los campos obligatorios están correctos.");
     });
 
-    // Función para mostrar mensaje recordatorio de la Oficina Judicial Virtual
-    function mostrarMensajeOficinaVirtual() {
-        return confirm(
-            "No olvide que este documento debe ser subido a la Oficina Judicial Virtual\n\n" +
-            "https://oficinajudicialvirtual.pjud.cl/\n\n" +
-            "¿Desea continuar para generar el PDF?"
-        );
-    }
-
-    // Generación PDF con márgenes reducidos y mensaje recordatorio
+    // ==================== GENERACIÓN PDF CON IFRAME OCULTO (NO BLOQUEADO) ====================
     function generarInformeProfesional() {
-        // PRIMERO: Validar campos obligatorios
+        // PASO 1: Validar campos obligatorios
         const errores = validarTodoAntesDePDF();
         if (errores.length) { 
             alert("No se puede generar el informe:\n- " + errores.join("\n- ")); 
             return; 
         }
         
-        // SEGUNDO: Mostrar mensaje recordatorio de la Oficina Judicial Virtual
-        const continuar = mostrarMensajeOficinaVirtual();
-        if (!continuar) return; // Si el usuario cancela, no genera el PDF
+        // PASO 2: Mostrar mensaje recordatorio de la Oficina Judicial Virtual
+        const continuar = confirm(
+            "No olvide que este documento debe ser subido a la Oficina Judicial Virtual\n\n" +
+            "https://oficinajudicialvirtual.pjud.cl/\n\n" +
+            "¿Desea continuar para generar el PDF?"
+        );
         
-        // TERCERO: Generar el PDF
-        const establecimiento = { nombre: document.getElementById('est_nombre').value.trim() || "Sin especificar", direccion: document.getElementById('est_direccion').value.trim() || "Sin dirección", comuna: document.getElementById('est_comuna').value, telefono: document.getElementById('est_telefono').value.trim() || "Sin teléfono", email: document.getElementById('est_email').value.trim() || "Sin correo" };
-        const nna = { nombre: document.getElementById('nombre_nna').value || "___________________", fechaNac: document.getElementById('fecha_nac_nna').value ? document.getElementById('fecha_nac_nna').value.split('-').reverse().join('/') : "________", edad: document.getElementById('edad_nna').value || "___", nacionalidad: document.getElementById('nacionalidad_nna').value || "No especificada", identificacion: (rutNnaTipo.value === 'rut' ? formatearRutParaPdf(rutNnaInput.value) : rutNnaInput.value) || "________", domicilio: document.getElementById('domicilio_nna').value || "___________________", curso: document.getElementById('curso_nna').value || "________", establecimientoEduc: document.getElementById('est_educ_nna').value || "________" };
+        if (!continuar) {
+            return;
+        }
+        
+        // PASO 3: Construir el contenido del PDF
+        const establecimiento = { 
+            nombre: document.getElementById('est_nombre').value.trim() || "Sin especificar", 
+            direccion: document.getElementById('est_direccion').value.trim() || "Sin dirección", 
+            comuna: document.getElementById('est_comuna').value, 
+            telefono: document.getElementById('est_telefono').value.trim() || "Sin teléfono", 
+            email: document.getElementById('est_email').value.trim() || "Sin correo" 
+        };
+        
+        const nna = { 
+            nombre: document.getElementById('nombre_nna').value || "___________________", 
+            fechaNac: document.getElementById('fecha_nac_nna').value ? document.getElementById('fecha_nac_nna').value.split('-').reverse().join('/') : "________", 
+            edad: document.getElementById('edad_nna').value || "___", 
+            nacionalidad: document.getElementById('nacionalidad_nna').value || "No especificada", 
+            identificacion: (rutNnaTipo.value === 'rut' ? formatearRutParaPdf(rutNnaInput.value) : rutNnaInput.value) || "________", 
+            domicilio: document.getElementById('domicilio_nna').value || "___________________", 
+            curso: document.getElementById('curso_nna').value || "________", 
+            establecimientoEduc: document.getElementById('est_educ_nna').value || "________" 
+        };
         
         const adultos = [];
         document.querySelectorAll('#adultosContainer .bloque-dinamico').forEach(b => { 
@@ -916,6 +940,7 @@
                 actividad: b.querySelector('.resp-actividad')?.value || "________" 
             }); 
         });
+        
         const agresores = [];
         document.querySelectorAll('#agresoresContainer .bloque-dinamico').forEach(b => { 
             const tipo = b.querySelector('.agr-tipo');
@@ -933,7 +958,11 @@
         });
 
         const fechaLocal = new Date().toLocaleDateString('es-CL', { year: 'numeric', month: 'long', day: 'numeric' });
-        function escapeHtml(s) { if (!s) return ''; return s.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+        
+        function escapeHtml(s) { 
+            if (!s) return ''; 
+            return s.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); 
+        }
         
         let tablaAdultos = '<table border="1"><thead><tr><th>Nombre</th><th>Nacionalidad</th><th>Identificación</th><th>Domicilio</th><th>Teléfono</th><th>Email</th><th>Actividad</th></tr></thead><tbody>';
         adultos.forEach(a => tablaAdultos += `<tr><td>${escapeHtml(a.nombre)}</td><td>${escapeHtml(a.nacionalidad)}</td><td>${escapeHtml(a.identificacion)}</td><td>${escapeHtml(a.domicilio)}</td><td>${escapeHtml(a.fono)}</td><td>${escapeHtml(a.email)}</td><td>${escapeHtml(a.actividad)}</td>`);
@@ -941,7 +970,7 @@
         
         let tablaAgresores = '<table border="1"><thead><tr><th>Nombre</th><th>Nacionalidad</th><th>F.Nac.</th><th>Edad</th><th>Identificación</th><th>Domicilio</th><th>Curso</th><th>Est. Educ.</th></tr></thead><tbody>';
         agresores.forEach(a => tablaAgresores += `<tr><td>${escapeHtml(a.nombre)}</td><td>${escapeHtml(a.nacionalidad)}</td><td>${escapeHtml(a.fechaNac)}</td><td>${escapeHtml(a.edad)}</td><td>${escapeHtml(a.identificacion)}</td><td>${escapeHtml(a.domicilio)}</td><td>${escapeHtml(a.curso)}</td><td>${escapeHtml(a.estEduc)}</td>`);
-        tablaAgresores += '</tbody></table>';
+        tablaAgresores += '</tbody></tr>';
 
         const contenido = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Informe_Medida_Proteccion</title><style>
             body{font-family:"Times New Roman",serif;padding:1cm 1.2cm;font-size:12pt;margin:0;} 
@@ -974,11 +1003,27 @@
         <div class="seccion-titulo">VIII. Acciones del Establecimiento</div><div class="contenido-texto">${escapeHtml(document.getElementById('acciones_establecimiento').value || "Sin información.").replace(/\n/g,'<br>')}</div>
         </body></html>`;
         
-        const win = window.open(); win.document.write(contenido); win.document.close(); win.focus(); win.print();
+        // PASO 4: Escribir en el iframe oculto y ejecutar impresión
+        const iframe = document.getElementById('printFrame');
+        iframe.srcdoc = contenido;
+        
+        // Esperar a que el iframe cargue el contenido y luego imprimir
+        iframe.onload = function() {
+            try {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+            } catch(e) {
+                console.error("Error al imprimir:", e);
+                alert("Hubo un problema al generar la impresión. Por favor, intente nuevamente.");
+            }
+            iframe.onload = null;
+        };
     }
 
     document.getElementById('generarPdfProfesional').addEventListener('click', generarInformeProfesional);
-    document.getElementById('resetFormBtn').addEventListener('click', () => { if (confirm("¿Limpiar todo el formulario?")) location.reload(); });
+    document.getElementById('resetFormBtn').addEventListener('click', () => { 
+        if (confirm("¿Limpiar todo el formulario?")) location.reload(); 
+    });
 </script>
 </body>
 </html>
