@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Formulario MP - Solicitud de Medida de Protección</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f7;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 28px 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form-container {
+            max-width: 1600px;
+            width: 100%;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: #1e3a5f;
+            color: white;
+            padding: 1.3rem 2rem;
+        }
+
+        .form-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .form-header p {
+            margin: 0.4rem 0 0;
+            opacity: 0.85;
+            font-size: 0.9rem;
+        }
+
+        form {
+            padding: 2rem 2rem 2.3rem;
+        }
+
+        .section {
+            margin-bottom: 2.4rem;
+            border-left: 4px solid #2c7da0;
+            padding-left: 1.3rem;
+            background: #fefefe;
+        }
+
+        .section-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #0b3b4f;
+            margin-bottom: 0.6rem;
+            border-bottom: 2px solid #cbdde6;
+            padding-bottom: 0.3rem;
+            display: inline-block;
+        }
+
+        .subsection {
+            margin: 1rem 0 0.6rem;
+            font-weight: 600;
+            color: #1f5068;
+            font-size: 1rem;
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1rem 1.5rem;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            position: relative;
+        }
+
+        .field-group label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1e4663;
+        }
+
+        .field-group input,
+        .field-group textarea,
+        .field-group select {
+            padding: 10px 12px;
+            border: 1px solid #bbcbd6;
+            border-radius: 14px;
+            font-size: 0.9rem;
+            background: white;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+
+        .rut-selector-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .rut-selector-group select {
+            width: 130px;
+            flex-shrink: 0;
+        }
+        .rut-selector-group input {
+            flex: 1;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #2c7da0;
+            box-shadow: 0 0 0 3px rgba(44,125,160,0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 110px;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .descripcion-texto {
+            background: #f8fafc;
+            padding: 12px 16px;
+            border-radius: 16px;
+            color: #2c3e4e;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            border-left: 3px solid #5fa7c2;
+            line-height: 1.45;
+        }
+
+        .rut-feedback, .email-feedback {
+            font-size: 0.7rem;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .rut-feedback.valid, .email-feedback.valid {
+            color: #2b7a4b;
+        }
+
+        .rut-feedback.invalid, .email-feedback.invalid {
+            color: #c7362b;
+        }
+
+        input.rut-error, input.email-error {
+            border-color: #c7362b;
+            background-color: #fff8f7;
+        }
+
+        input.rut-valid, input.email-valid {
+            border-color: #2b7a4b;
+            background-color: #f0faf5;
+        }
+
+        .bloque-dinamico {
+            background: #f9fbfd;
+            border: 1px solid #dce5ec;
+            border-radius: 20px;
+            padding: 1.2rem 1.2rem 0.8rem 1.2rem;
+            margin-bottom: 1.2rem;
+            position: relative;
+        }
+
+        .bloque-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .bloque-titulo {
+            font-weight: 700;
+            color: #1e5f6e;
+            font-size: 0.9rem;
+            background: #e6f0f3;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .btn-eliminar {
+            background: #dc3545;
+            border: none;
+            padding: 5px 16px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-eliminar:hover {
+            background: #b02a37;
+        }
+
+        .btn-agregar {
+            background: #28a745;
+            border: none;
+            padding: 8px 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 0.8rem;
+            margin-right: 0.5rem;
+        }
+
+        .btn-agregar:hover {
+            background: #218838;
+        }
+
+        .btn-agregar:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        button {
+            background: #1e5f6e;
+            border: none;
+            padding: 12px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: white;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-right: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        button:hover {
+            background: #134b57;
+            transform: translateY(-1px);
+        }
+
+        .pdf-profesional {
+            background: #2c7da0;
+        }
+        .pdf-profesional:hover {
+            background: #1f5e7a;
+        }
+        .reset-btn {
+            background: #6c757d;
+        }
+        .reset-btn:hover {
+            background: #49545c;
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .footer-note {
+            font-size: 0.75rem;
+            text-align: center;
+            border-top: 1px solid #e2edf2;
+            margin-top: 1.8rem;
+            padding-top: 1.2rem;
+            color: #4a627a;
+        }
+        .advertencia-limite {
+            font-size: 0.75rem;
+            color: #d9534f;
+            margin-top: 8px;
+        }
+        .requerido {
+            color: #dc3545;
+            font-size: 0.7rem;
+            margin-left: 4px;
+        }
+        /* Estilos para contador de caracteres */
+        .char-counter {
+            font-size: 0.7rem;
+            text-align: right;
+            margin-top: 4px;
+            color: #6c757d;
+        }
+        .char-counter.warning {
+            color: #d9534f;
+            font-weight: bold;
+        }
+        .textarea-container {
+            position: relative;
+        }
+        @media (max-width: 768px) {
+            form { padding: 1rem; }
+            .section { padding-left: 0.8rem; }
+            .bloque-dinamico { padding: 1rem; }
+            .grid-2col { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <div class="form-header">
+        <h1>Formulario MP - Solicitud de Medida de Protección</h1>
+        <p>Formulario dinámico | Hasta 3 adultos responsables y 5 presuntos agresores | Validación RUT/Pasaporte | Correo electrónico (solo adultos)</p>
+    </div>
+    <form id="proteccionForm">
+        <!-- DATOS DEL ESTABLECIMIENTO -->
+        <div class="section">
+            <div class="section-title">Datos del Establecimiento Educacional</div>
+            <div class="grid-2col">
+                <div class="field-group"><label>Nombre del establecimiento</label><input type="text" name="establecimiento_nombre" id="est_nombre" placeholder="Ej: Liceo Polivalente Coronel"></div>
+                <div class="field-group"><label>Dirección</label><input type="text" name="establecimiento_direccion" id="est_direccion" placeholder="Calle, número"></div>
+                <div class="field-group"><label>Comuna</label>
+                    <select name="establecimiento_comuna" id="est_comuna">
+                        <option value="Coronel">Coronel</option>
+                        <option value="Lota">Lota</option>
+                        <option value="Isla Santa María">Isla Santa María</option>
+                    </select>
+                </div>
+                <div class="field-group"><label>Teléfono</label><input type="tel" name="establecimiento_telefono" id="est_telefono" placeholder="+56 9 xxxx xxxx"></div>
+                <div class="field-group"><label>Correo electrónico</label><input type="email" name="establecimiento_email" id="est_email" placeholder="colegio@educacion.cl"></div>
+            </div>
+        </div>
+
+        <!-- I. IDENTIFICACIÓN NNA -->
+        <div class="section">
+            <div class="section-title">I. Identificación del Niño, Niña o Adolescente</div>
+            <div class="grid-2col">
+                <div class="field-group"><label>Nombre completo NNA</label><input type="text" name="nombre_nna" id="nombre_nna" placeholder="Nombre completo"></div>
+                <div class="field-group"><label>Fecha de nacimiento</label><input type="date" name="fecha_nac_nna" id="fecha_nac_nna"></div>
+                <div class="field-group"><label>Edad</label><input type="number" name="edad_nna" id="edad_nna" placeholder="Años" readonly style="background:#f5f5f5;"></div>
+                <div class="field-group"><label>Nacionalidad</label>
+                    <select name="nacionalidad_nna" id="nacionalidad_nna">
+                        <option value="">Seleccione</option>
+                        <option value="Chilena">Chilena</option>
+                        <option value="Venezolana">Venezolana</option>
+                        <option value="Peruana">Peruana</option>
+                        <option value="Haitiana">Haitiana</option>
+                        <option value="Colombiana">Colombiana</option>
+                        <option value="Boliviana">Boliviana</option>
+                        <option value="Argentina">Argentina</option>
+                        <option value="Ecuatoriana">Ecuatoriana</option>
+                        <option value="Otra">Otra</option>
+                    </select>
+                </div>
+                <div class="field-group" id="rutNnaGroup">
+                    <label>Identificación <span class="requerido">(RUT obligatorio si es chileno)</span></label>
+                    <div class="rut-selector-group">
+                        <select id="rutNnaTipo" class="rut-tipo">
+                            <option value="rut">RUT Chileno</option>
+                            <option value="pasaporte">Pasaporte / Extranjero</option>
+                        </select>
+                        <input type="text" name="rut_nna" id="rut_nna" placeholder="Ej: 12345678K">
+                    </div>
+                    <div id="rutNnaFeedback" class="rut-feedback"></div>
+                </div>
+                <div class="field-group"><label>Domicilio</label><input type="text" name="domicilio_nna" id="domicilio_nna" placeholder="Calle, número, comuna"></div>
+                <div class="field-group"><label>Curso</label><input type="text" name="curso_nna" id="curso_nna" placeholder="Ej: 5° básico"></div>
+                <div class="field-group"><label>Establecimiento educacional</label><input type="text" name="est_educ_nna" id="est_educ_nna" placeholder="Establecimiento educativo"></div>
+            </div>
+            
+            <!-- ADULTOS RESPONSABLES DINÁMICOS -->
+            <div class="subsection">Adultos Responsables (máximo 3)</div>
+            <div id="adultosContainer">
+                <div id="adultoOriginal" class="bloque-dinamico">
+                    <div class="bloque-header"><span class="bloque-titulo">Adulto responsable principal</span></div>
+                    <div class="grid-2col">
+                        <div class="field-group"><label>Nombre completo</label><input type="text" class="resp-nombre" placeholder="Nombre"></div>
+                        <div class="field-group"><label>Nacionalidad</label>
+                            <select class="resp-nacionalidad">
+                                <option value="">Seleccione</option>
+                                <option value="Chilena">Chilena</option>
+                                <option value="Venezolana">Venezolana</option>
+                                <option value="Peruana">Peruana</option>
+                                <option value="Haitiana">Haitiana</option>
+                                <option value="Colombiana">Colombiana</option>
+                                <option value="Boliviana">Boliviana</option>
+                                <option value="Argentina">Argentina</option>
+                                <option value="Ecuatoriana">Ecuatoriana</option>
+                                <option value="Otra">Otra</option>
+                            </select>
+                        </div>
+                        <div class="field-group">
+                            <label>Identificación <span class="requerido">(RUT obligatorio si es chileno)</span></label>
+                            <div class="rut-selector-group">
+                                <select class="resp-tipo">
+                                    <option value="rut">RUT Chileno</option>
+                                    <option value="pasaporte">Pasaporte / Extranjero</option>
+                                </select>
+                                <input type="text" class="resp-rut" placeholder="Ej: 12345678K">
+                            </div>
+                            <div class="rut-feedback resp-feedback"></div>
+                        </div>
+                        <div class="field-group"><label>Domicilio</label><input type="text" class="resp-domicilio" placeholder="Domicilio"></div>
+                        <div class="field-group"><label>Teléfono</label><input type="tel" class="resp-fono" placeholder="Teléfono"></div>
+                        <div class="field-group"><label>Correo electrónico</label><input type="email" class="resp-email" placeholder="correo@ejemplo.cl"><div class="email-feedback resp-email-feedback"></div></div>
+                        <div class="field-group"><label>Actividad / Ocupación</label><input type="text" class="resp-actividad" placeholder="Actividad"></div>
+                    </div>
+                </div>
+            </div>
+            <button type="button" id="btnAgregarAdulto" class="btn-agregar">+ Agregar adulto responsable (máx. 3)</button>
+            <div id="adultoLimiteMsg" class="advertencia-limite"></div>
+
+            <!-- PRESUNTOS AGRESORES DINÁMICOS -->
+            <div class="subsection">Presuntos Agresores (máximo 5)</div>
+            <div id="agresoresContainer">
+                <div id="agresorOriginal" class="bloque-dinamico">
+                    <div class="bloque-header"><span class="bloque-titulo">Presunto agresor 1</span></div>
+                    <div class="grid-2col">
+                        <div class="field-group"><label>Nombre completo</label><input type="text" class="agr-nombre" placeholder="Nombre"></div>
+                        <div class="field-group"><label>Nacionalidad</label>
+                            <select class="agr-nacionalidad">
+                                <option value="">Seleccione</option>
+                                <option value="Chilena">Chilena</option>
+                                <option value="Venezolana">Venezolana</option>
+                                <option value="Peruana">Peruana</option>
+                                <option value="Haitiana">Haitiana</option>
+                                <option value="Colombiana">Colombiana</option>
+                                <option value="Boliviana">Boliviana</option>
+                                <option value="Argentina">Argentina</option>
+                                <option value="Ecuatoriana">Ecuatoriana</option>
+                                <option value="Otra">Otra</option>
+                            </select>
+                        </div>
+                        <div class="field-group"><label>Fecha de nacimiento</label><input type="date" class="agr-fecha"></div>
+                        <div class="field-group"><label>Edad</label><input type="number" class="agr-edad" readonly style="background:#f5f5f5;"></div>
+                        <div class="field-group">
+                            <label>Identificación</label>
+                            <div class="rut-selector-group">
+                                <select class="agr-tipo">
+                                    <option value="rut">RUT Chileno</option>
+                                    <option value="pasaporte">Pasaporte / Extranjero</option>
+                                </select>
+                                <input type="text" class="agr-rut" placeholder="Ej: 12345678K">
+                            </div>
+                            <div class="rut-feedback agr-feedback"></div>
+                        </div>
+                        <div class="field-group"><label>Domicilio</label><input type="text" class="agr-domicilio" placeholder="Domicilio"></div>
+                        <div class="field-group"><label>Curso</label><input type="text" class="agr-curso" placeholder="Curso"></div>
+                        <div class="field-group"><label>Establecimiento educacional</label><input type="text" class="agr-estudio" placeholder="Establecimiento"></div>
+                    </div>
+                </div>
+            </div>
+            <button type="button" id="btnAgregarAgresor" class="btn-agregar">+ Agregar presunto agresor (máx. 5)</button>
+            <div id="agresorLimiteMsg" class="advertencia-limite"></div>
+        </div>
+
+        <!-- II-V Secciones narrativas con contador de caracteres -->
+        <div class="section">
+            <div class="section-title">II. Antecedentes Escolares</div>
+            <div class="descripcion-texto"><strong>Descripción:</strong> Antecedentes conductuales o de socialización del NNA con grupo de pares o docentes, necesidades especiales, rol del apoderado.</div>
+            <div class="textarea-container">
+                <textarea name="antecedentes_escolares" id="antecedentes_escolares" rows="5" maxlength="2000" placeholder="Escriba aquí los antecedentes escolares..."></textarea>
+                <div id="contadorEscolares" class="char-counter">0 / 2000 caracteres</div>
+            </div>
+        </div>
+        <div class="section">
+            <div class="section-title">III. Antecedentes Familiares</div>
+            <div class="descripcion-texto"><strong>Descripción:</strong> Composición del grupo familiar, cuidado del NNA, rol del apoderado, respuesta del adulto frente a acciones del establecimiento.</div>
+            <div class="textarea-container">
+                <textarea name="antecedentes_familiares" id="antecedentes_familiares" rows="6" maxlength="2000" placeholder="Escriba aquí los antecedentes familiares..."></textarea>
+                <div id="contadorFamiliares" class="char-counter">0 / 2000 caracteres</div>
+            </div>
+        </div>
+        <div class="section">
+            <div class="section-title">IV. Requerimiento de Medida de Protección</div>
+            <div class="descripcion-texto"><strong>Descripción:</strong> Vulneraciones de derecho detectadas y medidas de protección solicitadas.</div>
+            <div class="textarea-container">
+                <textarea name="vulneraciones" id="vulneraciones" rows="6" maxlength="2000" placeholder="Señale vulneraciones y requerimiento concreto..."></textarea>
+                <div id="contadorVulneraciones" class="char-counter">0 / 2000 caracteres</div>
+            </div>
+        </div>
+        <div class="section">
+            <div class="section-title">V. Acciones del Establecimiento Educacional</div>
+            <div class="descripcion-texto"><strong>Descripción:</strong> Gestiones, derivaciones, entrevistas, profesionales involucrados.</div>
+            <div class="textarea-container">
+                <textarea name="acciones_establecimiento" id="acciones_establecimiento" rows="6" maxlength="2000" placeholder="Detalle las acciones realizadas..."></textarea>
+                <div id="contadorAcciones" class="char-counter">0 / 2000 caracteres</div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button type="button" id="validateAllRutsBtn">Validar todas las identificaciones</button>
+            <button type="button" id="generarPdfProfesional" class="pdf-profesional">Generar / Imprimir PDF</button>
+            <button type="button" id="resetFormBtn" class="reset-btn">Limpiar formulario</button>
+        </div>
+        <div class="footer-note">* RUT Chileno obligatorio para NNA y Adultos Responsables. Pasaporte no obligatorio. Correo electrónico validado solo en adultos responsables. Límite de 2000 caracteres por campo de texto.</div>
+    </form>
+</div>
+
+<script>
+    // ==================== CONTADOR DE CARACTERES ====================
+    const MAX_CARACTERES = 2000;
+    
+    function inicializarContador(textareaId, contadorId) {
+        const textarea = document.getElementById(textareaId);
+        const contador = document.getElementById(contadorId);
+        
+        if (textarea && contador) {
+            function actualizarContador() {
+                const longitud = textarea.value.length;
+                contador.textContent = `${longitud} / ${MAX_CARACTERES} caracteres`;
+                if (longitud >= MAX_CARACTERES) {
+                    contador.classList.add('warning');
+                } else {
+                    contador.classList.remove('warning');
+                }
+            }
+            textarea.addEventListener('input', actualizarContador);
+            actualizarContador();
+        }
+    }
+    
+    // Inicializar contadores para los 4 textarea
+    inicializarContador('antecedentes_escolares', 'contadorEscolares');
+    inicializarContador('antecedentes_familiares', 'contadorFamiliares');
+    inicializarContador('vulneraciones', 'contadorVulneraciones');
+    inicializarContador('acciones_establecimiento', 'contadorAcciones');
+    
+    // ==================== FUNCIONES AUXILIARES ====================
+    function calcularEdad(fechaNacimiento) {
+        if (!fechaNacimiento) return '';
+        const hoy = new Date();
+        const nacimiento = new Date(fechaNacimiento);
+        let edad = hoy.getFullYear() - nacimiento.getFullYear();
+        const mes = hoy.getMonth() - nacimiento.getMonth();
+        if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) edad--;
+        return edad;
+    }
+
+    function validarRutChileno(rutCompleto) {
+        if (!rutCompleto || typeof rutCompleto !== 'string') return false;
+        let cleaned = rutCompleto.trim().replace(/\./g, '').replace(/\-/g, '').toUpperCase();
+        if (cleaned.length === 0) return false;
+        let cuerpo = cleaned.slice(0, -1);
+        let dvIngresado = cleaned.slice(-1);
+        if (!/^\d+$/.test(cuerpo)) return false;
+        if (!/^[0-9K]$/.test(dvIngresado)) return false;
+        let suma = 0, multiplicador = 2;
+        for (let i = cuerpo.length - 1; i >= 0; i--) {
+            suma += parseInt(cuerpo.charAt(i), 10) * multiplicador;
+            multiplicador++;
+            if (multiplicador > 7) multiplicador = 2;
+        }
+        let resto = suma % 11;
+        let dvCalculado = 11 - resto;
+        let dvCaracter = (dvCalculado === 11) ? '0' : (dvCalculado === 10) ? 'K' : dvCalculado.toString();
+        return dvCaracter === dvIngresado;
+    }
+
+    function formatearRutParaPdf(rut) {
+        if (!rut) return '';
+        let cleaned = rut.trim().replace(/\./g, '').replace(/\-/g, '').toUpperCase();
+        if (cleaned.length < 2) return rut;
+        let cuerpo = cleaned.slice(0, -1);
+        let dv = cleaned.slice(-1);
+        return cuerpo + '-' + dv;
+    }
+
+    function validarEmail(email) {
+        if (!email.trim()) return true;
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+
+    function validarCampoRutDinamico(input, feedbackDiv, tipoSelect, esObligatorio = false) {
+        let valor = input.value.trim();
+        let tipo = tipoSelect.value;
+        if (valor === "") {
+            if (esObligatorio && tipo === 'rut') {
+                feedbackDiv.innerHTML = "[!] RUT obligatorio";
+                feedbackDiv.className = "rut-feedback invalid";
+                input.classList.add('rut-error');
+                return false;
+            }
+            feedbackDiv.innerHTML = "";
+            feedbackDiv.className = "rut-feedback";
+            input.classList.remove('rut-error', 'rut-valid');
+            return true;
+        }
+        if (tipo === 'pasaporte') {
+            feedbackDiv.innerHTML = "[OK] Pasaporte registrado";
+            feedbackDiv.className = "rut-feedback valid";
+            input.classList.add('rut-valid');
+            input.classList.remove('rut-error');
+            return true;
+        }
+        if (valor.includes('.') || valor.includes('-')) {
+            feedbackDiv.innerHTML = "[!] Sin puntos ni guiones";
+            feedbackDiv.className = "rut-feedback invalid";
+            input.classList.add('rut-error');
+            return false;
+        }
+        let esValido = validarRutChileno(valor);
+        if (esValido) {
+            feedbackDiv.innerHTML = "[OK] RUT válido";
+            feedbackDiv.className = "rut-feedback valid";
+            input.classList.add('rut-valid');
+            input.classList.remove('rut-error');
+        } else {
+            feedbackDiv.innerHTML = "[X] RUT inválido";
+            feedbackDiv.className = "rut-feedback invalid";
+            input.classList.add('rut-error');
+        }
+        return esValido;
+    }
+
+    function validarCampoEmail(input, feedbackDiv) {
+        let email = input.value.trim();
+        if (email === "") {
+            feedbackDiv.innerHTML = "";
+            feedbackDiv.className = "email-feedback";
+            input.classList.remove('email-error', 'email-valid');
+            return true;
+        }
+        if (validarEmail(email)) {
+            feedbackDiv.innerHTML = "[OK] Correo válido";
+            feedbackDiv.className = "email-feedback valid";
+            input.classList.add('email-valid');
+            input.classList.remove('email-error');
+            return true;
+        } else {
+            feedbackDiv.innerHTML = "[X] Correo inválido";
+            feedbackDiv.className = "email-feedback invalid";
+            input.classList.add('email-error');
+            return false;
+        }
+    }
+
+    // Configuración NNA
+    const fechaNacNna = document.getElementById('fecha_nac_nna');
+    const edadNna = document.getElementById('edad_nna');
+    fechaNacNna.addEventListener('change', () => edadNna.value = calcularEdad(fechaNacNna.value));
+
+    const rutNnaInput = document.getElementById('rut_nna');
+    const rutNnaFeedback = document.getElementById('rutNnaFeedback');
+    const rutNnaTipo = document.getElementById('rutNnaTipo');
+    function validarNnaRut() { validarCampoRutDinamico(rutNnaInput, rutNnaFeedback, rutNnaTipo, true); }
+    rutNnaInput.addEventListener('input', validarNnaRut);
+    rutNnaTipo.addEventListener('change', validarNnaRut);
+    validarNnaRut();
+
+    // ========== ADULTOS RESPONSABLES ==========
+    let adultoCount = 1;
+    const MAX_ADULTOS = 3;
+    const adultosContainer = document.getElementById('adultosContainer');
+    const btnAgregarAdulto = document.getElementById('btnAgregarAdulto');
+    const adultoLimiteMsg = document.getElementById('adultoLimiteMsg');
+    const adultoOriginal = document.getElementById('adultoOriginal');
+
+    function actualizarBotonesAdultos() {
+        btnAgregarAdulto.disabled = (adultoCount >= MAX_ADULTOS);
+        adultoLimiteMsg.innerText = adultoCount >= MAX_ADULTOS ? "Límite máximo de 3 adultos responsables alcanzado." : `Puede agregar hasta ${MAX_ADULTOS - adultoCount} adulto(s) más.`;
+    }
+
+    function agregarEventosAdulto(bloque) {
+        const tipo = bloque.querySelector('.resp-tipo');
+        const rut = bloque.querySelector('.resp-rut');
+        const feedback = bloque.querySelector('.resp-feedback');
+        const email = bloque.querySelector('.resp-email');
+        const emailFeedback = bloque.querySelector('.resp-email-feedback');
+        const fnRut = () => validarCampoRutDinamico(rut, feedback, tipo, true);
+        rut.addEventListener('input', fnRut);
+        tipo.addEventListener('change', fnRut);
+        email.addEventListener('input', () => validarCampoEmail(email, emailFeedback));
+        validarCampoRutDinamico(rut, feedback, tipo, true);
+        if (email.value.trim()) validarCampoEmail(email, emailFeedback);
+    }
+
+    function eliminarAdulto(bloque) { 
+        if (adultoCount > 1) { 
+            bloque.remove(); 
+            adultoCount--; 
+            actualizarBotonesAdultos(); 
+        } 
+    }
+
+    function crearBloqueAdultoHTML(indice) {
+        const div = document.createElement('div');
+        div.className = 'bloque-dinamico';
+        div.innerHTML = `
+            <div class="bloque-header">
+                <span class="bloque-titulo">Adulto responsable ${indice + 1}</span>
+            </div>
+            <div class="grid-2col">
+                <div class="field-group"><label>Nombre completo</label><input type="text" class="resp-nombre" placeholder="Nombre"></div>
+                <div class="field-group"><label>Nacionalidad</label>
+                    <select class="resp-nacionalidad">
+                        <option value="">Seleccione</option>
+                        <option value="Chilena">Chilena</option>
+                        <option value="Venezolana">Venezolana</option>
+                        <option value="Peruana">Peruana</option>
+                        <option value="Haitiana">Haitiana</option>
+                        <option value="Colombiana">Colombiana</option>
+                        <option value="Boliviana">Boliviana</option>
+                        <option value="Argentina">Argentina</option>
+                        <option value="Ecuatoriana">Ecuatoriana</option>
+                        <option value="Otra">Otra</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label>Identificación <span class="requerido">(RUT obligatorio si es chileno)</span></label>
+                    <div class="rut-selector-group">
+                        <select class="resp-tipo"><option value="rut">RUT Chileno</option><option value="pasaporte">Pasaporte / Extranjero</option></select>
+                        <input type="text" class="resp-rut" placeholder="Ej: 12345678K">
+                    </div>
+                    <div class="rut-feedback resp-feedback"></div>
+                </div>
+                <div class="field-group"><label>Domicilio</label><input type="text" class="resp-domicilio" placeholder="Domicilio"></div>
+                <div class="field-group"><label>Teléfono</label><input type="tel" class="resp-fono" placeholder="Teléfono"></div>
+                <div class="field-group"><label>Correo electrónico</label><input type="email" class="resp-email" placeholder="correo@ejemplo.cl"><div class="email-feedback resp-email-feedback"></div></div>
+                <div class="field-group"><label>Actividad / Ocupación</label><input type="text" class="resp-actividad" placeholder="Actividad"></div>
+            </div>
+        `;
+        const header = div.querySelector('.bloque-header');
+        const btnEliminar = document.createElement('button');
+        btnEliminar.type = 'button';
+        btnEliminar.innerText = 'Eliminar';
+        btnEliminar.className = 'btn-eliminar';
+        btnEliminar.onclick = () => eliminarAdulto(div);
+        header.appendChild(btnEliminar);
+        return div;
+    }
+
+    btnAgregarAdulto.addEventListener('click', () => { 
+        if (adultoCount < MAX_ADULTOS) { 
+            const nuevoBloque = crearBloqueAdultoHTML(adultoCount);
+            agregarEventosAdulto(nuevoBloque);
+            adultosContainer.appendChild(nuevoBloque); 
+            adultoCount++; 
+            actualizarBotonesAdultos(); 
+        } 
+    });
+
+    // ========== AGRESORES ==========
+    let agresorCount = 1;
+    const MAX_AGR = 5;
+    const agresoresContainer = document.getElementById('agresoresContainer');
+    const btnAgregarAgresor = document.getElementById('btnAgregarAgresor');
+    const agresorLimiteMsgDiv = document.getElementById('agresorLimiteMsg');
+    const agresorOriginal = document.getElementById('agresorOriginal');
+
+    function actualizarBotonesAgresores() {
+        btnAgregarAgresor.disabled = (agresorCount >= MAX_AGR);
+        agresorLimiteMsgDiv.innerText = agresorCount >= MAX_AGR ? "Límite máximo de 5 presuntos agresores alcanzado." : `Puede agregar hasta ${MAX_AGR - agresorCount} agresor(es) más.`;
+    }
+
+    function asignarAutoEdadAgresor(bloque) {
+        const fecha = bloque.querySelector('.agr-fecha');
+        const edad = bloque.querySelector('.agr-edad');
+        if (fecha && edad) {
+            fecha.addEventListener('change', () => edad.value = calcularEdad(fecha.value));
+        }
+    }
+
+    function agregarEventosAgresor(bloque) {
+        const tipo = bloque.querySelector('.agr-tipo');
+        const rut = bloque.querySelector('.agr-rut');
+        const feedback = bloque.querySelector('.agr-feedback');
+        const fnRut = () => validarCampoRutDinamico(rut, feedback, tipo, false);
+        rut.addEventListener('input', fnRut);
+        tipo.addEventListener('change', fnRut);
+        asignarAutoEdadAgresor(bloque);
+        validarCampoRutDinamico(rut, feedback, tipo, false);
+    }
+
+    function eliminarAgresor(bloque) { 
+        if (agresorCount > 1) { 
+            bloque.remove(); 
+            agresorCount--; 
+            actualizarBotonesAgresores(); 
+        } 
+    }
+
+    function crearBloqueAgresorHTML(indice) {
+        const div = document.createElement('div');
+        div.className = 'bloque-dinamico';
+        div.innerHTML = `
+            <div class="bloque-header">
+                <span class="bloque-titulo">Presunto agresor ${indice + 1}</span>
+            </div>
+            <div class="grid-2col">
+                <div class="field-group"><label>Nombre completo</label><input type="text" class="agr-nombre" placeholder="Nombre"></div>
+                <div class="field-group"><label>Nacionalidad</label>
+                    <select class="agr-nacionalidad">
+                        <option value="">Seleccione</option>
+                        <option value="Chilena">Chilena</option>
+                        <option value="Venezolana">Venezolana</option>
+                        <option value="Peruana">Peruana</option>
+                        <option value="Haitiana">Haitiana</option>
+                        <option value="Colombiana">Colombiana</option>
+                        <option value="Boliviana">Boliviana</option>
+                        <option value="Argentina">Argentina</option>
+                        <option value="Ecuatoriana">Ecuatoriana</option>
+                        <option value="Otra">Otra</option>
+                    </select>
+                </div>
+                <div class="field-group"><label>Fecha de nacimiento</label><input type="date" class="agr-fecha"></div>
+                <div class="field-group"><label>Edad</label><input type="number" class="agr-edad" readonly style="background:#f5f5f5;"></div>
+                <div class="field-group">
+                    <label>Identificación</label>
+                    <div class="rut-selector-group">
+                        <select class="agr-tipo"><option value="rut">RUT Chileno</option><option value="pasaporte">Pasaporte / Extranjero</option></select>
+                        <input type="text" class="agr-rut" placeholder="Ej: 12345678K">
+                    </div>
+                    <div class="rut-feedback agr-feedback"></div>
+                </div>
+                <div class="field-group"><label>Domicilio</label><input type="text" class="agr-domicilio" placeholder="Domicilio"></div>
+                <div class="field-group"><label>Curso</label><input type="text" class="agr-curso" placeholder="Curso"></div>
+                <div class="field-group"><label>Establecimiento educacional</label><input type="text" class="agr-estudio" placeholder="Establecimiento"></div>
+            </div>
+        `;
+        const header = div.querySelector('.bloque-header');
+        const btnEliminar = document.createElement('button');
+        btnEliminar.type = 'button';
+        btnEliminar.innerText = 'Eliminar';
+        btnEliminar.className = 'btn-eliminar';
+        btnEliminar.onclick = () => eliminarAgresor(div);
+        header.appendChild(btnEliminar);
+        return div;
+    }
+
+    btnAgregarAgresor.addEventListener('click', () => { 
+        if (agresorCount < MAX_AGR) { 
+            const nuevoBloque = crearBloqueAgresorHTML(agresorCount);
+            agregarEventosAgresor(nuevoBloque);
+            agresoresContainer.appendChild(nuevoBloque); 
+            agresorCount++; 
+            actualizarBotonesAgresores(); 
+        } 
+    });
+
+    // Eventos para los bloques originales
+    agregarEventosAdulto(adultoOriginal);
+    agregarEventosAgresor(agresorOriginal);
+    actualizarBotonesAdultos();
+    actualizarBotonesAgresores();
+
+    // Validación global
+    function validarTodoAntesDePDF() {
+        let errores = [];
+        if (rutNnaTipo.value === 'rut' && !rutNnaInput.value.trim()) errores.push("RUT del NNA es obligatorio");
+        else if (rutNnaTipo.value === 'rut' && rutNnaInput.value.trim() && !validarRutChileno(rutNnaInput.value.trim())) errores.push("RUT del NNA inválido");
+        
+        document.querySelectorAll('#adultosContainer .bloque-dinamico').forEach((bloque, idx) => {
+            const tipo = bloque.querySelector('.resp-tipo');
+            const rut = bloque.querySelector('.resp-rut');
+            const email = bloque.querySelector('.resp-email');
+            if (tipo && tipo.value === 'rut') {
+                if (!rut.value.trim()) errores.push(`Adulto ${idx + 1}: RUT obligatorio`);
+                else if (!validarRutChileno(rut.value.trim())) errores.push(`Adulto ${idx + 1}: RUT inválido`);
+            }
+            if (email && email.value.trim() && !validarEmail(email.value.trim())) errores.push(`Adulto ${idx + 1}: correo electrónico inválido`);
+        });
+        return errores;
+    }
+
+    document.getElementById('validateAllRutsBtn').addEventListener('click', () => {
+        const err = validarTodoAntesDePDF();
+        if (err.length) alert("Problemas encontrados:\n- " + err.join("\n- "));
+        else alert("Todos los campos obligatorios están correctos.");
+    });
+
+    // Función para mostrar mensaje recordatorio de la Oficina Judicial Virtual
+    function mostrarMensajeOficinaVirtual() {
+        return confirm(
+            "No olvide que este documento debe ser subido a la Oficina Judicial Virtual\n\n" +
+            "https://oficinajudicialvirtual.pjud.cl/\n\n" +
+            "¿Desea continuar para generar el PDF?"
+        );
+    }
+
+    // Generación PDF con márgenes reducidos y mensaje recordatorio
+    function generarInformeProfesional() {
+        // PRIMERO: Validar campos obligatorios
+        const errores = validarTodoAntesDePDF();
+        if (errores.length) { 
+            alert("No se puede generar el informe:\n- " + errores.join("\n- ")); 
+            return; 
+        }
+        
+        // SEGUNDO: Mostrar mensaje recordatorio de la Oficina Judicial Virtual
+        const continuar = mostrarMensajeOficinaVirtual();
+        if (!continuar) return; // Si el usuario cancela, no genera el PDF
+        
+        // TERCERO: Generar el PDF
+        const establecimiento = { nombre: document.getElementById('est_nombre').value.trim() || "Sin especificar", direccion: document.getElementById('est_direccion').value.trim() || "Sin dirección", comuna: document.getElementById('est_comuna').value, telefono: document.getElementById('est_telefono').value.trim() || "Sin teléfono", email: document.getElementById('est_email').value.trim() || "Sin correo" };
+        const nna = { nombre: document.getElementById('nombre_nna').value || "___________________", fechaNac: document.getElementById('fecha_nac_nna').value ? document.getElementById('fecha_nac_nna').value.split('-').reverse().join('/') : "________", edad: document.getElementById('edad_nna').value || "___", nacionalidad: document.getElementById('nacionalidad_nna').value || "No especificada", identificacion: (rutNnaTipo.value === 'rut' ? formatearRutParaPdf(rutNnaInput.value) : rutNnaInput.value) || "________", domicilio: document.getElementById('domicilio_nna').value || "___________________", curso: document.getElementById('curso_nna').value || "________", establecimientoEduc: document.getElementById('est_educ_nna').value || "________" };
+        
+        const adultos = [];
+        document.querySelectorAll('#adultosContainer .bloque-dinamico').forEach(b => { 
+            const tipo = b.querySelector('.resp-tipo');
+            const rutVal = b.querySelector('.resp-rut')?.value || "";
+            adultos.push({ 
+                nombre: b.querySelector('.resp-nombre')?.value || "___________________",
+                nacionalidad: b.querySelector('.resp-nacionalidad')?.value || "No especificada",
+                identificacion: (tipo && tipo.value === 'rut' ? formatearRutParaPdf(rutVal) : rutVal) || "________", 
+                domicilio: b.querySelector('.resp-domicilio')?.value || "___________________", 
+                fono: b.querySelector('.resp-fono')?.value || "________", 
+                email: b.querySelector('.resp-email')?.value || "________", 
+                actividad: b.querySelector('.resp-actividad')?.value || "________" 
+            }); 
+        });
+        const agresores = [];
+        document.querySelectorAll('#agresoresContainer .bloque-dinamico').forEach(b => { 
+            const tipo = b.querySelector('.agr-tipo');
+            const rutVal = b.querySelector('.agr-rut')?.value || "";
+            agresores.push({ 
+                nombre: b.querySelector('.agr-nombre')?.value || "___________________",
+                nacionalidad: b.querySelector('.agr-nacionalidad')?.value || "No especificada",
+                fechaNac: b.querySelector('.agr-fecha')?.value ? b.querySelector('.agr-fecha').value.split('-').reverse().join('/') : "________", 
+                edad: b.querySelector('.agr-edad')?.value || "___", 
+                identificacion: (tipo && tipo.value === 'rut' ? formatearRutParaPdf(rutVal) : rutVal) || "________", 
+                domicilio: b.querySelector('.agr-domicilio')?.value || "___________________", 
+                curso: b.querySelector('.agr-curso')?.value || "________", 
+                estEduc: b.querySelector('.agr-estudio')?.value || "________" 
+            }); 
+        });
+
+        const fechaLocal = new Date().toLocaleDateString('es-CL', { year: 'numeric', month: 'long', day: 'numeric' });
+        function escapeHtml(s) { if (!s) return ''; return s.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+        
+        let tablaAdultos = '<table border="1"><thead><tr><th>Nombre</th><th>Nacionalidad</th><th>Identificación</th><th>Domicilio</th><th>Teléfono</th><th>Email</th><th>Actividad</th></tr></thead><tbody>';
+        adultos.forEach(a => tablaAdultos += `<tr><td>${escapeHtml(a.nombre)}</td><td>${escapeHtml(a.nacionalidad)}</td><td>${escapeHtml(a.identificacion)}</td><td>${escapeHtml(a.domicilio)}</td><td>${escapeHtml(a.fono)}</td><td>${escapeHtml(a.email)}</td><td>${escapeHtml(a.actividad)}</td>`);
+        tablaAdultos += '</tbody></table>';
+        
+        let tablaAgresores = '<table border="1"><thead><tr><th>Nombre</th><th>Nacionalidad</th><th>F.Nac.</th><th>Edad</th><th>Identificación</th><th>Domicilio</th><th>Curso</th><th>Est. Educ.</th></tr></thead><tbody>';
+        agresores.forEach(a => tablaAgresores += `<tr><td>${escapeHtml(a.nombre)}</td><td>${escapeHtml(a.nacionalidad)}</td><td>${escapeHtml(a.fechaNac)}</td><td>${escapeHtml(a.edad)}</td><td>${escapeHtml(a.identificacion)}</td><td>${escapeHtml(a.domicilio)}</td><td>${escapeHtml(a.curso)}</td><td>${escapeHtml(a.estEduc)}</td>`);
+        tablaAgresores += '</tbody></table>';
+
+        const contenido = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Informe_Medida_Proteccion</title><style>
+            body{font-family:"Times New Roman",serif;padding:1cm 1.2cm;font-size:12pt;margin:0;} 
+            .membrete{text-align:right;border-bottom:1px solid #aaa;padding-bottom:0.5rem;margin-bottom:1rem;} 
+            .titulo{font-size:18pt;font-weight:bold;text-align:center;margin:0.5rem 0;} 
+            .seccion-titulo{font-size:14pt;font-weight:bold;background:#f1f5f9;padding:6px 12px;border-left:5px solid #1e3a5f;margin:1.2rem 0 0.8rem;} 
+            table{width:100%;border-collapse:collapse;margin:0.8rem 0;font-size:11pt;} 
+            th,td{border:1px solid #222;padding:6px 8px;vertical-align:top;} 
+            th{background:#e9ecef;text-align:left;}
+            .contenido-texto{text-align:justify;margin:0.8rem 0;line-height:1.4;}
+        </style></head><body>
+        <div class="membrete">${establecimiento.comuna}, ${fechaLocal}</div>
+        <div class="titulo">SOLICITUD DE MEDIDA DE PROTECCIÓN</div>
+        <div class="seccion-titulo">I. Datos del Establecimiento</div><div><strong>${escapeHtml(establecimiento.nombre)}</strong><br>${escapeHtml(establecimiento.direccion)} - ${escapeHtml(establecimiento.comuna)}<br>Tel: ${escapeHtml(establecimiento.telefono)} · ${escapeHtml(establecimiento.email)}</div>
+        <div class="seccion-titulo">II. Identificación del NNA</div>
+        <table>
+            <tr><th style="width:30%">Nombre completo</th><td>${escapeHtml(nna.nombre)}</td></tr>
+            <tr><th>Fecha de nacimiento</th><td>${escapeHtml(nna.fechaNac)}</td></tr>
+            <tr><th>Edad</th><td>${escapeHtml(nna.edad)} años</td></tr>
+            <tr><th>Nacionalidad</th><td>${escapeHtml(nna.nacionalidad)}</td></tr>
+            <tr><th>Identificación (RUT/Pasaporte)</th><td>${escapeHtml(nna.identificacion)}</td></tr>
+            <tr><th>Domicilio</th><td>${escapeHtml(nna.domicilio)}</td></tr>
+            <tr><th>Curso / Establecimiento</th><td>${escapeHtml(nna.curso)} - ${escapeHtml(nna.establecimientoEduc)}</td></tr>
+        </table>
+        <div class="seccion-titulo">III. Adultos Responsables</div>${tablaAdultos}
+        <div class="seccion-titulo">IV. Presuntos Agresores</div>${tablaAgresores}
+        <div class="seccion-titulo">V. Antecedentes Escolares</div><div class="contenido-texto">${escapeHtml(document.getElementById('antecedentes_escolares').value || "Sin información.").replace(/\n/g,'<br>')}</div>
+        <div class="seccion-titulo">VI. Antecedentes Familiares</div><div class="contenido-texto">${escapeHtml(document.getElementById('antecedentes_familiares').value || "Sin información.").replace(/\n/g,'<br>')}</div>
+        <div class="seccion-titulo">VII. Requerimiento de Protección</div><div class="contenido-texto">${escapeHtml(document.getElementById('vulneraciones').value || "Sin información.").replace(/\n/g,'<br>')}</div>
+        <div class="seccion-titulo">VIII. Acciones del Establecimiento</div><div class="contenido-texto">${escapeHtml(document.getElementById('acciones_establecimiento').value || "Sin información.").replace(/\n/g,'<br>')}</div>
+        </body></html>`;
+        
+        const win = window.open(); win.document.write(contenido); win.document.close(); win.focus(); win.print();
+    }
+
+    document.getElementById('generarPdfProfesional').addEventListener('click', generarInformeProfesional);
+    document.getElementById('resetFormBtn').addEventListener('click', () => { if (confirm("¿Limpiar todo el formulario?")) location.reload(); });
+</script>
+</body>
+</html>
